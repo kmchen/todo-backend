@@ -1,0 +1,57 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "extends": ["airbnb-base", "plugin:@typescript-eslint/recommended", "prettier", "plugin:import/typescript"],
+  "plugins": ["prettier", "import"],
+  "parserOptions": {
+      "ecmaVersion": 2018,
+      "sourceType": "module"
+  },
+  "rules": {
+      "prettier/prettier": [
+          "error",
+          {
+              "endOfLine": "auto"
+          }
+      ],
+      "import/no-unresolved": "error",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/no-explicit-any": 1,
+      "@typescript-eslint/no-inferrable-types": [
+          "warn",
+          {
+              "ignoreParameters": true
+          }
+      ],
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-var-requires": "off",
+      "no-use-before-define": "off",
+      "no-useless-constructor": "off",
+      "import/no-extraneous-dependencies": ["off", { "devDependencies": true }],
+      "no-restricted-syntax": "off",
+      "class-methods-use-this": "off",
+      "import/prefer-default-export": "off",
+      "import/extensions": [
+          "error",
+          "ignorePackages",
+          {
+              "ts": "never",
+              "js": "never"
+          }
+      ]
+  },
+  "settings": {
+      "import/resolver": {
+          "typescript": {
+              "alwaysTryTypes": true
+          },
+          "node": {
+              "extensions": [".js", ".ts", ".json"]
+          }
+      },
+      "import/parsers": {
+          "@typescript-eslint/parser": [".js", ".ts"]
+      }
+  },
+  "ignorePatterns": ["build/*", "coverage/*", "**/*.d.ts", "lib/*", "release.config.js"]
+}
