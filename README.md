@@ -32,6 +32,12 @@ $ yarn
 
 ## Usage
 
+To run the app and Redis in docker
+
+```sh
+$ docker-compose up
+```
+
 To run the app in dev mode with hot reload
 
 ```sh
