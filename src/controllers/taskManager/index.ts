@@ -2,6 +2,13 @@ import { Request, Response } from 'express'
 import { taskManagerService } from 'services'
 import asyncHandler from 'utils/asyncHandler'
 import { nanoid } from 'nanoid'
+import { HttpApiException } from 'exceptions'
+import { pipe } from 'fp-ts/function'
+import { task, either } from 'fp-ts'
+import { Either, right, left } from 'fp-ts/Either'
+
+const minLength = (s: string): Either<string, string> => (s.length > 0 ? right(s) : left('at least 1 characters'))
+const isBoolean = (value: boolean): Either<string, boolean> => (typeof value == 'boolean' ? right(value) : left('value is not boolean'))
 
 /**
  * @typedef Task
@@ -18,11 +25,20 @@ import { nanoid } from 'nanoid'
  */
 export const newTask = asyncHandler(async (req: Request, res: Response) => {
     const { text } = req.body
+    const validText = pipe(
+        minLength(text),
+        either.fold(
+            () => {
+                throw new HttpApiException(400, `invalid payload`)
+            },
+            (text) => text
+        )
+    )
     const timestamp = new Date().getTime()
     const id = nanoid()
     await taskManagerService.createTask('km', {
         id,
-        text,
+        text: validText,
         createdAt: timestamp,
         lastEdit: timestamp,
         deleted: false,
@@ -61,9 +77,16 @@ export const taskList = asyncHandler(async (req: Request, res: Response) => {
  * @returns {Error}  default - Unexpected error
  */
 export const updateTask = asyncHandler(async (req: Request, res: Response) => {
-    const { id, text, completed, important } = req.body
-    const lastEdit = new Date().getTime()
-    const taskList = await taskManagerService.updateTask('km', id, completed, important)
+    const { id, completed, important } = req.body
+    const eitherFold = either.fold(
+        () => {
+            throw new HttpApiException(400, `invalid payload`)
+        },
+        (value: boolean) => value
+    )
+    const isImportant = pipe(isBoolean(important), eitherFold)
+    const isCompleted = pipe(isBoolean(completed), eitherFold)
+    const taskList = await taskManagerService.updateTask('km', id, isCompleted, isImportant)
     res.json(taskList)
 })
 
@@ -77,6 +100,15 @@ export const updateTask = asyncHandler(async (req: Request, res: Response) => {
  */
 export const deleteTask = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params
-    await taskManagerService.deleteTask('km', id)
+    const validId = pipe(
+        minLength(id),
+        either.fold(
+            () => {
+                throw new HttpApiException(400, `invalid payload`)
+            },
+            (id) => id
+        )
+    )
+    await taskManagerService.deleteTask('km', validId)
     res.end()
 })
