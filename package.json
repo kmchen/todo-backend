@@ -11,7 +11,7 @@
         "start": "node -r tsconfig-paths/register ./build/main.js",
         "dev": "nodemon ./src/main.ts",
         "test": "jest --coverage --forceExit ./test/services",
-        "test:integration": "jest --coverage --forceExit ./test/integration",
+        "test:integration": "jest --forceExit ./test/integration",
         "test:ci": "jest --ci --passWithNoTests",
         "test:coverage": "jest --ci --passWithNoTests --coverage",
         "test:watch": "jest --coverage --watchAll",

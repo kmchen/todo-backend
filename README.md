@@ -14,6 +14,7 @@ This service is for getting and manipulating the todo task
 
 -   Typescript
 -   Express
+-   Redis
 -   fp-ts
 
 ## Table of Contents
@@ -63,10 +64,9 @@ yarn test
 
 ## Integration
 
-To run integration test, please build a todo-backend image first
+To run integration test, please run redis and todo-backend services first
 
 ```
-docker build -t todo-backend .
 docker-compose up
 yarn test:integration
 ```
