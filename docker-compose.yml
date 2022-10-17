@@ -1,22 +1,22 @@
 version: '3'
 
 services:
-  redis_db:
-    image: 'redis'
-    ports:
-      - '6379:6379'
-    volumes:
-      - $PWD/redis-data:/var/lib/redis
-  todo-backend:
-    build: .
-    environment:
-      - PORT=3000
-      - REDIS_HOST=redis_db
-      - REDIS_PREFIX=${REDIS_PREFIX}
-      - REDIS_TTL=${REDIS_TTL}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_DELIMITER=${REDIS_DELIMITER}
-    ports:
-      - '3000:3000'
-    depends_on:
-      - redis_db
+    redis_db:
+        image: 'redis'
+        ports:
+            - '6379:6379'
+        volumes:
+            - $PWD/redis-data:/var/lib/redis
+    todo-backend:
+        image: 'todo-backend'
+        environment:
+            - PORT=3000
+            - REDIS_HOST=redis_db
+            - REDIS_PREFIX=todo
+            - REDIS_TTL=172800
+            - REDIS_PORT=6379
+            - REDIS_DELIMITER=':'
+        ports:
+            - '3000:3000'
+        depends_on:
+            - redis_db

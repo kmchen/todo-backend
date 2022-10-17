@@ -4,10 +4,11 @@ import asyncHandler from 'utils/asyncHandler'
 import { nanoid } from 'nanoid'
 import { HttpApiException } from 'exceptions'
 import { pipe } from 'fp-ts/function'
-import { task, either } from 'fp-ts'
+import { either } from 'fp-ts'
 import { Either, right, left } from 'fp-ts/Either'
 
-const minLength = (s: string): Either<string, string> => (s.length > 0 ? right(s) : left('at least 1 characters'))
+const minLengthText = (s: string): Either<string, string> => (s.length > 0 ? right(s) : left('at least 1 characters'))
+const minLengthId = (s: string): Either<string, string> => (s.length === 21 ? right(s) : left('must be 21 characters'))
 const isBoolean = (value: boolean): Either<string, boolean> => (typeof value == 'boolean' ? right(value) : left('value is not boolean'))
 
 /**
@@ -26,10 +27,10 @@ const isBoolean = (value: boolean): Either<string, boolean> => (typeof value == 
 export const newTask = asyncHandler(async (req: Request, res: Response) => {
     const { text } = req.body
     const validText = pipe(
-        minLength(text),
+        minLengthText(text),
         either.fold(
             () => {
-                throw new HttpApiException(400, `invalid payload`)
+                throw new HttpApiException(400, `forbidden request`)
             },
             (text) => text
         )
@@ -45,7 +46,7 @@ export const newTask = asyncHandler(async (req: Request, res: Response) => {
         completed: false,
         important: false,
     })
-    res.end(id as string)
+    res.status(201).end(id as string)
 })
 
 /**
@@ -78,6 +79,15 @@ export const taskList = asyncHandler(async (req: Request, res: Response) => {
  */
 export const updateTask = asyncHandler(async (req: Request, res: Response) => {
     const { id, completed, important } = req.body
+    const validId = pipe(
+        minLengthId(id),
+        either.fold(
+            () => {
+                throw new HttpApiException(403, `forbidden request`)
+            },
+            (text) => text
+        )
+    )
     const eitherFold = either.fold(
         () => {
             throw new HttpApiException(400, `invalid payload`)
@@ -86,7 +96,7 @@ export const updateTask = asyncHandler(async (req: Request, res: Response) => {
     )
     const isImportant = pipe(isBoolean(important), eitherFold)
     const isCompleted = pipe(isBoolean(completed), eitherFold)
-    const taskList = await taskManagerService.updateTask('km', id, isCompleted, isImportant)
+    const taskList = await taskManagerService.updateTask('km', validId, isCompleted, isImportant)
     res.json(taskList)
 })
 
@@ -101,10 +111,10 @@ export const updateTask = asyncHandler(async (req: Request, res: Response) => {
 export const deleteTask = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params
     const validId = pipe(
-        minLength(id),
+        minLengthId(id),
         either.fold(
             () => {
-                throw new HttpApiException(400, `invalid payload`)
+                throw new HttpApiException(403, `forbidden request`)
             },
             (id) => id
         )

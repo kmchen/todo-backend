@@ -4,15 +4,24 @@
 
 This service is for getting and manipulating the todo task
 
+## What's new after the first interview
+
+-   Add FP support using fp-ts
+-   Validate request payload on the controller before reaching service and reposotory
+-   Add integration test
+
 ### Tech stack
 
 -   Typescript
 -   Express
+-   fp-ts
 
 ## Table of Contents
 
 -   [Install](#install)
 -   [Usage](#usage)
+-   [Unit Test](#unit)
+-   [Integration Test](#integration)
 -   [API](#api)
 
 ## Install
@@ -35,7 +44,7 @@ $ yarn
 To run the app and Redis in docker
 
 ```sh
-$ docker-compose up
+$ docker-compose up redis_db
 ```
 
 To run the app in dev mode with hot reload
@@ -44,13 +53,23 @@ To run the app in dev mode with hot reload
 $ yarn dev
 ```
 
-To run tests with watch mode
+## Unit
 
-```sh
-$ yarn test:watch
+The unit tests are covered by test coverage
+
+```
+yarn test
 ```
 
-### Any optional sections
+## Integration
+
+To run integration test, please build a todo-backend image first
+
+```
+docker build -t todo-backend .
+docker-compose up
+yarn test:integration
+```
 
 ## API
 
