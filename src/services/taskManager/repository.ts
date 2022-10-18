@@ -1,5 +1,5 @@
 import { WrappedNodeRedisClient } from 'handy-redis'
-import { Task } from './types'
+import { Task } from 'types'
 
 class TaskManagerRepository {
     constructor(private readonly client: WrappedNodeRedisClient) {}
@@ -25,8 +25,7 @@ class TaskManagerRepository {
     }
 
     removeTask = async (user: string, taskId: string): Promise<number> => {
-        const numOfDeletedItem = await this.client.hdel(user, taskId)
-        return numOfDeletedItem
+        return await this.client.hdel(user, taskId)
     }
 }
 

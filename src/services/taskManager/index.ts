@@ -1,9 +1,9 @@
-import { TaskNotFoundException, HttpApiException } from 'exceptions'
-import TaskManagerRepository from './repository'
-import { Task } from './types'
-
 import { either, taskEither } from 'fp-ts'
 import { pipe } from 'fp-ts/function'
+
+import { TaskNotFoundException, HttpApiException } from 'exceptions'
+import TaskManagerRepository from './repository'
+import { Task, TaskProperty } from 'types'
 class TaskManagerService {
     constructor(private readonly repository: TaskManagerRepository) {}
 
@@ -70,7 +70,7 @@ class TaskManagerService {
         )
     }
 
-    async updateTask(user: string, id: string, completed: boolean, important: boolean): Promise<void> {
+    async updateTask(user: string, id: string, updatedProperties: TaskProperty): Promise<void> {
         const getTask = taskEither.tryCatch<Error, Task>(
             async () => {
                 const savedTask = await this.repository.getTask(user, id)
@@ -92,7 +92,7 @@ class TaskManagerService {
                         }
                         throw new HttpApiException(500, `getTask failed with id ${id}: ${e}`)
                     },
-                    (savedTask) => ({ ...savedTask, completed, important, lastEdit: new Date().getTime() })
+                    (savedTask) => ({ ...savedTask, ...updatedProperties, lastEdit: new Date().getTime() })
                 )
             )
         )

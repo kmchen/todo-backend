@@ -1,9 +1,11 @@
-export interface Task {
+export type Task = TaskProperty & {
     id: string
     text: string
     lastEdit?: number
     createdAt?: number
-    deleted?: boolean
+}
+
+export type TaskProperty = {
     completed?: boolean
     important?: boolean
 }

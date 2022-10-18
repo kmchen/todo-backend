@@ -52,7 +52,6 @@ describe('TaskManager Repository', () => {
         expect(task).toHaveProperty('id')
         expect(task).toHaveProperty('createdAt')
         expect(task).toHaveProperty('lastEdit')
-        expect(task).toHaveProperty('deleted')
         expect(task).toHaveProperty('text')
         expect(task).toHaveProperty('completed')
         expect(task).toHaveProperty('important')

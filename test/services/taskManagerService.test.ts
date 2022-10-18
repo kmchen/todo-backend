@@ -25,7 +25,6 @@ describe('TaskManager service', () => {
             expect(task).toHaveProperty('id')
             expect(task).toHaveProperty('createdAt')
             expect(task).toHaveProperty('lastEdit')
-            expect(task).toHaveProperty('deleted')
             expect(task).toHaveProperty('text')
             expect(task).toHaveProperty('important')
             expect(task).toHaveProperty('completed')
@@ -71,7 +70,7 @@ describe('TaskManager service', () => {
         }
         const service = new TaskManagerService(mockedForecastRepository)
         await expect(async () => {
-            await service.updateTask('userId', 'someId', true, true)
+            await service.updateTask('userId', 'someId', { completed: true, important: true })
         }).rejects.toThrow()
     })
 
@@ -80,7 +79,7 @@ describe('TaskManager service', () => {
         mockedForecastRepository.getTask = () => Promise.resolve(taskData[0])
         mockedForecastRepository.saveTask = () => Promise.resolve(0)
         const service = new TaskManagerService(mockedForecastRepository)
-        const resp = await service.updateTask('userId', 'someId', true, true)
+        const resp = await service.updateTask('userId', 'someId', { completed: true, important: true })
         expect(resp).toBeUndefined()
     })
 

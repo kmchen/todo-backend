@@ -42,7 +42,6 @@ export const newTask = asyncHandler(async (req: Request, res: Response) => {
         text: validText,
         createdAt: timestamp,
         lastEdit: timestamp,
-        deleted: false,
         completed: false,
         important: false,
     })
@@ -88,15 +87,22 @@ export const updateTask = asyncHandler(async (req: Request, res: Response) => {
             (text) => text
         )
     )
-    const eitherFold = either.fold(
-        () => {
-            throw new HttpApiException(400, `invalid payload`)
-        },
-        (value: boolean) => value
-    )
-    const isImportant = pipe(isBoolean(important), eitherFold)
-    const isCompleted = pipe(isBoolean(completed), eitherFold)
-    const taskList = await taskManagerService.updateTask('km', validId, isCompleted, isImportant)
+
+    let updatedProperties: { completed?: boolean; important?: boolean } = {}
+    const eitherFoldWithUpdate = (key: string) =>
+        either.fold(
+            () => {
+                throw new HttpApiException(400, `invalid payload`)
+            },
+            (value: boolean) => ({ ...updatedProperties, [key]: value })
+        )
+    if (important != undefined) {
+        updatedProperties = pipe(isBoolean(important), eitherFoldWithUpdate('important'))
+    }
+    if (completed != undefined) {
+        updatedProperties = pipe(isBoolean(completed), eitherFoldWithUpdate('completed'))
+    }
+    const taskList = await taskManagerService.updateTask('km', validId, updatedProperties)
     res.json(taskList)
 })
 
